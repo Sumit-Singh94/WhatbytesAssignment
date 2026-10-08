@@ -1,5 +1,5 @@
 import './globals.css';
-import { StoreProvider } from '@/components/StoreProvider';
+import { StoreProvider } from '../components/StoreProvider';
 
 export const metadata = {
   title: 'WhatBytes Store',
