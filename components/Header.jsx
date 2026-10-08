@@ -1,23 +1,26 @@
 "use client";
 
 import { Search, ShoppingCart } from "lucide-react";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useStore } from "@/components/StoreProvider";
 
 export default function Header() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { cartCount } = useStore();
 
-  const [search, setSearch] = useState(
-    searchParams.get("search") || ""
-  );
+  const [search, setSearch] = useState("");
+
+  // Load existing search value from the URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setSearch(params.get("search") || "");
+  }, []);
 
   function handleSearch(event) {
     event.preventDefault();
 
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
 
     if (search.trim()) {
       params.set("search", search.trim());
@@ -35,12 +38,12 @@ export default function Header() {
   return (
     <header className="w-full bg-[#0b5cab]">
       <div className="mx-auto flex h-[80px] max-w-[1250px] items-center justify-between px-5 md:px-10">
-       
+        {/* Logo */}
         <div className="shrink-0">
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="!text-5xl font-bold leading-none text-white"
+            className="!text-[32px] !font-bold !leading-none !text-white"
           >
             Logo
           </button>
@@ -54,7 +57,6 @@ export default function Header() {
           <div className="relative">
             <Search
               size={18}
-              strokeWidth={2}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-white"
             />
 
