@@ -1,142 +1,103 @@
-'use client';
+"use client";
 
-import {
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
+import { useRouter, useSearchParams } from "next/navigation";
+import { RotateCcw } from "lucide-react";
+import { categories } from "@/lib/products";
 
-import {
-  brands,
-  categories,
-} from '@/lib/products';
-
-export function Filters() {
+export default function Filters() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const selectedCategory =
-    searchParams.get('category') || 'all';
+  const currentCategory = searchParams.get("category") || "all";
+  const currentMaxPrice = Number(searchParams.get("maxPrice")) || 1000;
 
-  const selectedBrand =
-    searchParams.get('brand') || 'all';
+  function updateFilter(key, value) {
+    const params = new URLSearchParams(searchParams.toString());
 
-  const price =
-    searchParams.get('price') || '0-1000';
-
-  const maxPrice =
-    Number(price.split('-')[1]) || 1000;
-
-  function updateFilter(name, value) {
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
-
-    if (!value || value === 'All') {
-      params.delete(name);
+    if (!value || value === "all") {
+      params.delete(key);
     } else {
-      params.set(name, value.toLowerCase());
+      params.set(key, value);
     }
 
     router.push(`/?${params.toString()}`);
   }
 
+  function resetFilters() {
+    router.push("/");
+  }
+
   return (
-    <aside className="space-y-6">
-      <div className="rounded-xl bg-gradient-to-br from-[#0759a8] to-[#06488b] p-5 text-white shadow-sm">
-        <h2 className="mb-6 text-2xl font-bold">
-          Filters
-        </h2>
+    <aside className="h-fit rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-bold text-[#0b2344]">Filters</h2>
 
-        <div className="mb-7">
-          <h3 className="mb-3 text-lg font-semibold">
-            Category
-          </h3>
-
-          <div className="space-y-3">
-            {categories.map((category) => (
-              <label
-                key={category}
-                className="flex cursor-pointer items-center gap-3 text-sm"
-              >
-                <input
-                  type="radio"
-                  name="category"
-                  checked={
-                    selectedCategory ===
-                    category.toLowerCase()
-                  }
-                  onChange={() =>
-                    updateFilter(
-                      'category',
-                      category
-                    )
-                  }
-                  className="h-4 w-4 accent-blue-500"
-                />
-
-                <span>{category}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="mb-3 text-lg font-semibold">
-            Price
-          </h3>
-
-          <input
-            type="range"
-            min="0"
-            max="1000"
-            step="10"
-            value={maxPrice}
-            onChange={(event) =>
-              updateFilter(
-                'price',
-                `0-${event.target.value}`
-              )
-            }
-            className="w-full accent-white"
-          />
-
-          <div className="mt-2 flex justify-between text-sm">
-            <span>$0</span>
-            <span>${maxPrice}</span>
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
+        >
+          <RotateCcw size={13} />
+          Reset
+        </button>
       </div>
 
-      <div className="rounded-xl bg-white p-5 shadow-sm">
-        <h3 className="mb-4 text-lg font-bold text-[#0b2344]">
-          Brand
+      <div>
+        <h3 className="mb-3 text-sm font-semibold text-[#0b2344]">
+          Category
         </h3>
 
-        <div className="space-y-3">
-          {brands.map((brand) => (
+        <div className="space-y-2">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+            <input
+              type="radio"
+              name="category"
+              checked={currentCategory === "all"}
+              onChange={() => updateFilter("category", "all")}
+              className="accent-blue-600"
+            />
+            All Categories
+          </label>
+
+          {categories.map((category) => (
             <label
-              key={brand}
-              className="flex cursor-pointer items-center gap-3 text-sm text-gray-700"
+              key={category}
+              className="flex cursor-pointer items-center gap-2 text-sm text-gray-600"
             >
               <input
                 type="radio"
-                name="brand"
-                checked={
-                  selectedBrand ===
-                  brand.toLowerCase()
-                }
-                onChange={() =>
-                  updateFilter(
-                    'brand',
-                    brand
-                  )
-                }
-                className="h-4 w-4 accent-blue-600"
+                name="category"
+                checked={currentCategory === category}
+                onChange={() => updateFilter("category", category)}
+                className="accent-blue-600"
               />
 
-              <span>{brand}</span>
+              {category}
             </label>
           ))}
+        </div>
+      </div>
+
+      <div className="mt-8 border-t border-gray-100 pt-6">
+        <h3 className="mb-3 text-sm font-semibold text-[#0b2344]">
+          Maximum Price
+        </h3>
+
+        <input
+          type="range"
+          min="10"
+          max="1000"
+          step="10"
+          value={currentMaxPrice}
+          onChange={(event) =>
+            updateFilter("maxPrice", event.target.value)
+          }
+          className="w-full accent-blue-600"
+        />
+
+        <div className="mt-2 flex justify-between text-xs text-gray-500">
+          <span>$10</span>
+          <span>${currentMaxPrice}</span>
         </div>
       </div>
     </aside>

@@ -1,43 +1,46 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 const StoreContext = createContext(null);
-const CART_KEY = 'whatbytes-cart';
 
 export function StoreProvider({ children }) {
   const [cart, setCart] = useState([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  // Load the cart once when the app starts.
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem(CART_KEY);
+      const savedCart = localStorage.getItem("whatbytes-cart");
 
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
     } catch (error) {
-      console.error('Could not load the saved cart.', error);
+      console.error("Failed to load cart:", error);
     } finally {
-      setIsLoaded(true);
+      setLoaded(true);
     }
   }, []);
 
-  // Keep the cart between page refreshes.
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!loaded) return;
 
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  }, [cart, isLoaded]);
+    localStorage.setItem("whatbytes-cart", JSON.stringify(cart));
+  }, [cart, loaded]);
 
   function addToCart(product) {
     setCart((currentCart) => {
-      const itemAlreadyInCart = currentCart.find(
+      const existingProduct = currentCart.find(
         (item) => item.id === product.id
       );
 
-      if (itemAlreadyInCart) {
+      if (existingProduct) {
         return currentCart.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
@@ -45,7 +48,13 @@ export function StoreProvider({ children }) {
         );
       }
 
-      return [...currentCart, { ...product, quantity: 1 }];
+      return [
+        ...currentCart,
+        {
+          ...product,
+          quantity: 1,
+        },
+      ];
     });
   }
 
@@ -57,7 +66,9 @@ export function StoreProvider({ children }) {
 
     setCart((currentCart) =>
       currentCart.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
+        item.id === productId
+          ? { ...item, quantity }
+          : item
       )
     );
   }
@@ -68,14 +79,18 @@ export function StoreProvider({ children }) {
     );
   }
 
-  const cartCount = cart.reduce(
-    (total, item) => total + item.quantity,
-    0
+  const cartCount = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart]
   );
 
-  const cartTotal = cart.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
+  const cartTotal = useMemo(
+    () =>
+      cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+    [cart]
   );
 
   const value = {
@@ -95,11 +110,11 @@ export function StoreProvider({ children }) {
 }
 
 export function useStore() {
-  const store = useContext(StoreContext);
+  const context = useContext(StoreContext);
 
-  if (!store) {
-    throw new Error('useStore must be used inside StoreProvider');
+  if (!context) {
+    throw new Error("useStore must be used inside StoreProvider");
   }
 
-  return store;
+  return context;
 }

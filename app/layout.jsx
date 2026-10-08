@@ -1,9 +1,9 @@
-import './globals.css';
-import { StoreProvider } from '../components/StoreProvider';
+import "./globals.css";
+import { StoreProvider } from "@/components/StoreProvider";
 
 export const metadata = {
-  title: 'WhatBytes Store',
-  description: 'A simple e-commerce frontend built for the WhatBytes assignment.',
+  title: "WhatBytes Store",
+  description: "Product listing and shopping cart application",
 };
 
 export default function RootLayout({ children }) {

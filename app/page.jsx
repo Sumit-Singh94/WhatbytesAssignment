@@ -1,29 +1,16 @@
-import { Suspense } from 'react';
+import { Suspense } from "react";
+import HomePage from "@/components/HomePage";
 
-import { Header } from '@/components/Header';
-import { Filters } from '@/components/Filters';
-import { ProductListing } from '@/components/ProductListing';
-import { Footer } from '@/components/Footer';
-
-export default function HomePage() {
+export default function Page() {
   return (
-    <div className="min-h-screen">
-      <Suspense
-        fallback={
-          <div className="flex min-h-screen items-center justify-center">
-            Loading...
-          </div>
-        }
-      >
-        <Header />
-
-        <main className="mx-auto grid max-w-[1250px] grid-cols-1 gap-7 px-5 py-8 md:grid-cols-[220px_1fr] md:px-8">
-          <Filters />
-          <ProductListing />
-        </main>
-
-        <Footer />
-      </Suspense>
-    </div>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#f5f8fc]">
+          <p className="text-[#0b2344]">Loading products...</p>
+        </div>
+      }
+    >
+      <HomePage />
+    </Suspense>
   );
 }

@@ -1,80 +1,114 @@
-'use client';
+"use client";
 
-import { Minus, Plus, ShoppingCart } from 'lucide-react';
-import { useState } from 'react';
-import { useStore } from './StoreProvider';
+import { useState } from "react";
+import Link from "next/link";
+import { ArrowLeft, Minus, Plus, ShoppingCart, Star } from "lucide-react";
+import { useStore } from "@/components/StoreProvider";
 
-export function ProductDetail({ product }) {
-  const { addToCart } = useStore();
+export default function ProductDetail({ product }) {
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useStore();
 
-  function addSelectedQuantity() {
+  function handleAddToCart() {
     for (let i = 0; i < quantity; i += 1) {
       addToCart(product);
     }
   }
 
   return (
-    <article className="detail-card">
-      <div className="detail-image">
-        <img src={product.image} alt={product.title} />
-      </div>
+    <div className="min-h-screen bg-[#f5f8fc]">
+      <main className="mx-auto max-w-[1100px] px-5 py-8 md:px-8">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600"
+        >
+          <ArrowLeft size={17} />
+          Back to products
+        </Link>
 
-      <div className="detail-content">
-        <span className="detail-category">{product.category}</span>
-        <h1>{product.title}</h1>
-
-        <div className="detail-rating">
-          <span className="stars">★★★★★</span>
-          <span>{product.rating}/5</span>
-        </div>
-
-        <div className="detail-price">${product.price}</div>
-        <p>{product.description}</p>
-
-        <div className="detail-meta">
-          <div>
-            <span>Brand</span>
-            <br />
-            <strong>{product.brand}</strong>
+        <div className="grid overflow-hidden rounded-2xl bg-white shadow-sm md:grid-cols-2">
+          <div className="flex min-h-[400px] items-center justify-center bg-[#f7f9fc] p-8">
+            <img
+              src={product.image}
+              alt={product.title}
+              className="max-h-[420px] w-full object-contain"
+            />
           </div>
 
-          <div>
-            <span>Category</span>
-            <br />
-            <strong>{product.category}</strong>
+          <div className="p-7 md:p-10">
+            <span className="inline-block rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+              {product.category}
+            </span>
+
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-[#0b2344]">
+              {product.title}
+            </h1>
+
+            <div className="mt-4 flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                <Star
+                  size={17}
+                  className="fill-yellow-400 text-yellow-400"
+                />
+                <span className="font-medium text-gray-700">
+                  {product.rating}
+                </span>
+              </div>
+
+              <span className="text-gray-400">•</span>
+
+              <span className="text-sm text-gray-500">
+                Customer rating
+              </span>
+            </div>
+
+            <p className="mt-6 text-3xl font-bold text-[#0b2344]">
+              ${product.price.toFixed(2)}
+            </p>
+
+            <p className="mt-6 leading-7 text-gray-600">
+              {product.description}
+            </p>
+
+            <div className="mt-8 flex items-center gap-4">
+              <div className="flex items-center rounded-lg border border-gray-200">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuantity((current) => Math.max(1, current - 1))
+                  }
+                  className="p-3 text-gray-600 hover:bg-gray-50"
+                >
+                  <Minus size={16} />
+                </button>
+
+                <span className="w-10 text-center font-semibold">
+                  {quantity}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setQuantity((current) => current + 1)
+                  }
+                  className="p-3 text-gray-600 hover:bg-gray-50"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#0b2344] px-5 py-3 font-semibold text-white transition hover:bg-blue-600"
+              >
+                <ShoppingCart size={19} />
+                Add to Cart
+              </button>
+            </div>
           </div>
         </div>
-
-        <div className="quantity-row">
-          <strong>Quantity</strong>
-
-          <div className="quantity">
-            <button
-              aria-label="Decrease quantity"
-              onClick={() =>
-                setQuantity((current) => Math.max(1, current - 1))
-              }
-            >
-              <Minus size={15} />
-            </button>
-
-            <b>{quantity}</b>
-
-            <button
-              aria-label="Increase quantity"
-              onClick={() => setQuantity((current) => current + 1)}
-            >
-              <Plus size={15} />
-            </button>
-          </div>
-        </div>
-
-        <button className="detail-add" onClick={addSelectedQuantity}>
-          <ShoppingCart size={18} />
-          Add to Cart
-        </button>
-      </div>
-    </article>
+      </main>
+    </div>
   );
 }

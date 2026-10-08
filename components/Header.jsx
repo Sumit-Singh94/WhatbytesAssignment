@@ -1,121 +1,105 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import {
-  Search,
-  ShoppingCart,
-  UserCircle,
-  X,
-} from 'lucide-react';
+import Link from "next/link";
+import { Search, ShoppingCart, User } from "lucide-react";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useStore } from "@/components/StoreProvider";
 
-import {
-  useRouter,
-  useSearchParams,
-} from 'next/navigation';
-
-import { useEffect, useState } from 'react';
-import { useStore } from './StoreProvider';
-
-export function Header() {
+export default function Header() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const { cartCount } = useStore();
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(
+    searchParams.get("search") || ""
+  );
 
-  useEffect(() => {
-    setSearch(searchParams.get('search') || '');
-  }, [searchParams]);
-
-  function handleSearch(event) {
+  function handleSubmit(event) {
     event.preventDefault();
 
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
+    const params = new URLSearchParams(searchParams.toString());
 
-    const value = search.trim();
-
-    if (value) {
-      params.set('search', value);
+    if (search.trim()) {
+      params.set("search", search.trim());
     } else {
-      params.delete('search');
+      params.delete("search");
     }
 
     router.push(`/?${params.toString()}`);
   }
 
-  function clearSearch() {
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
-
-    params.delete('search');
-    setSearch('');
-
-    router.push(`/?${params.toString()}`);
-  }
-
   return (
-    <header className="sticky top-0 z-50 flex min-h-[80px] items-center justify-between gap-6 bg-gradient-to-r from-[#0759a8] to-[#06488b] px-6 py-4 text-white shadow-md md:px-10">
-      
-      <Link
-        href="/"
-        className="shrink-0 text-3xl font-bold tracking-tight"
-      >
-        Logo
-      </Link>
-
-      <form
-        onSubmit={handleSearch}
-        className="flex h-11 w-full max-w-[520px] items-center gap-3 rounded-lg border border-white/50 bg-white/5 px-4"
-      >
-        <Search size={19} />
-
-        <input
-          value={search}
-          onChange={(event) =>
-            setSearch(event.target.value)
-          }
-          placeholder="Search for products..."
-          className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/80"
-        />
-
-        {search && (
-          <button
-            type="button"
-            onClick={clearSearch}
-            className="text-white/80 transition hover:text-white"
-          >
-            <X size={16} />
-          </button>
-        )}
-      </form>
-
-      <div className="flex shrink-0 items-center gap-3">
+    <header className="sticky top-0 z-50 border-b border-gray-100 bg-white">
+      <div className="mx-auto flex max-w-[1250px] items-center gap-4 px-5 py-4 md:px-8">
         <Link
-          href="/cart"
-          className="relative flex h-11 items-center gap-2 rounded-lg bg-[#003d79] px-5 font-semibold transition hover:bg-[#003365]"
+          href="/"
+          className="shrink-0 text-xl font-extrabold tracking-tight text-[#0b2344]"
         >
-          <ShoppingCart size={18} />
-          <span className="hidden sm:inline">
-            Cart
-          </span>
-
-          {cartCount > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold">
-              {cartCount}
-            </span>
-          )}
+          What<span className="text-blue-600">Bytes</span>
         </Link>
 
-        <button
-          aria-label="Profile"
-          className="hidden rounded-full p-1 transition hover:bg-white/10 sm:block"
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto hidden max-w-xl flex-1 md:block"
         >
-          <UserCircle size={24} />
-        </button>
+          <div className="relative">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search products..."
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-blue-500 focus:bg-white"
+            />
+          </div>
+        </form>
+
+        <div className="ml-auto flex items-center gap-2">
+          <Link
+            href="/cart"
+            className="relative rounded-full p-2.5 text-[#0b2344] transition hover:bg-blue-50"
+          >
+            <ShoppingCart size={21} />
+
+            {cartCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+
+          <button
+            type="button"
+            className="rounded-full p-2.5 text-[#0b2344] transition hover:bg-blue-50"
+          >
+            <User size={21} />
+          </button>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-100 px-5 py-3 md:hidden">
+        <form onSubmit={handleSubmit}>
+          <div className="relative">
+            <Search
+              size={17}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+
+            <input
+              type="text"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search products..."
+              className="w-full rounded-full border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-blue-500"
+            />
+          </div>
+        </form>
       </div>
     </header>
   );
